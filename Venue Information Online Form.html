@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Venue Information – HTML Tool (v22)</title>
+  <style>
+    :root { --bg:#0b0f14; --card:#121821; --muted:#2a3442; --text:#e8f0ff; --sub:#9fb3c8; --accent:#5aa6ff; --radius:14px; }
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{ margin:0; font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; background:linear-gradient(180deg,#0b0f14,#0e131a 40%,#0b0f14); color:var(--text) }
+    .site-header{ padding:28px 20px 8px }
+    .site-header-inner{ max-width:1100px; margin:0 auto; text-align:center; }
+    h1{ margin:0 0 6px; font-size:28px; letter-spacing:.2px }
+    p.lede{ margin:0; color:var(--sub); max-width:900px; margin-left:auto; margin-right:auto }
+    .container{ display:grid; grid-template-columns:1fr; gap:18px; padding:20px; max-width:1100px; margin:0 auto }
+    .card{ background:radial-gradient(1200px 600px at 10% -20%, rgba(90,166,255,.08), transparent 60%), var(--card); border:1px solid var(--muted); border-radius:var(--radius); box-shadow:0 10px 24px rgba(0,0,0,.35) }
+    .card h2{ margin:0; font-size:18px; letter-spacing:.2px }
+    .section{ padding:18px; border-top:1px dashed var(--muted) }
+    .section:first-child{ border-top:0 }
+    .section>header{ padding:0 0 8px }
+    form{ display:block }
+    .grid-2{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px }
+    .grid-auto{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px }
+    @media (max-width:820px){ .grid-2{ grid-template-columns:1fr } }
+    label{ font-size:12px; color:var(--sub); display:block; margin-bottom:6px; letter-spacing:.3px }
+    .req::after{ content:" *"; color:var(--accent) }
+    input[type="text"],input[type="tel"],input[type="email"],input[type="number"],select,textarea{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--muted); background:#0f141c; color:var(--text); outline:none; transition:border .15s ease, box-shadow .15s ease; font-size:14px }
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+    textarea{ min-height:110px; resize:vertical }
+    input:focus,select:focus,textarea:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(90,166,255,.15) }
+    .inline{ display:flex; gap:10px; align-items:center; flex-wrap:wrap }
+    .table{ width:100%; border-collapse:collapse }
+    .table th,.table td{ border-bottom:1px dashed var(--muted); padding:10px; text-align:left }
+    .table th{ color:var(--sub); font-weight:600 }
+    .table tr:last-child td{ border-bottom:0 }
+    .btn{ appearance:none; background:var(--accent); color:#001024; border:none; border-radius:12px; padding:10px 14px; font-weight:800; letter-spacing:.4px; cursor:pointer; box-shadow:0 8px 18px rgba(90,166,255,.35); transition:transform .06s ease, opacity .2s ease, box-shadow .2s ease; text-transform:uppercase }
+    .btn:hover{ transform:translateY(-1px) }
+    .btn:active{ transform:translateY(0); box-shadow:0 6px 14px rgba(90,166,255,.3) }
+    .btn.secondary{ background:#101822; color:var(--text); border:1px solid var(--muted); box-shadow:none; text-transform:none; font-weight:700; letter-spacing:.2px }
+    .btn.ghost{ background:transparent; color:var(--sub); border:1px dashed var(--muted); box-shadow:none; text-transform:none; font-weight:700; letter-spacing:.2px }
+    .controls{ display:flex; gap:10px; align-items:center; flex-wrap:wrap }
+    .seg{ display:inline-grid; grid-auto-flow:column; grid-auto-columns:1fr; border:1px solid var(--muted); border-radius:10px; overflow:hidden }
+    .seg input{ display:none }
+    .seg label{ margin:0; padding:8px 12px; background:#0f141c; color:#9fb3c8; cursor:pointer; user-select:none; text-align:center }
+    .seg input:checked+label{ background:var(--accent); color:#001024; font-weight:700 }
+    .mono{ font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size:12px; line-height:1.35; white-space:pre-wrap; word-break:break-word; background:#0f141c; border:1px solid var(--muted); border-radius:10px; padding:12px; max-height:60vh; overflow:auto }
+    .hint{ color:var(--sub); font-size:12px }
+    .footer-actions{ display:flex; gap:10px; justify-content:flex-end; padding:14px; border-top:1px dashed var(--muted) }
+    .filebox{ display:grid; grid-template-columns:1fr auto; gap:10px }
+    .radio-dot{ display:inline-block; width:16px; height:16px; border-radius:50%; border:2px solid var(--muted); position:relative; }
+    .radio-dot input{ appearance:none; width:16px; height:16px; margin:0; position:absolute; inset:0; cursor:pointer; }
+    .radio-dot input:checked{ background:var(--accent); border-radius:50%; }
+    .cell-center{ display:flex; align-items:center; justify-content:center; gap:8px; }
+    #chargesMatrix td:not(:first-child), #chargesMatrix th:not(:first-child){ text-align:center; }
+    #stylesTable{ width:100%; border-collapse:collapse; table-layout:fixed; }
+    #stylesTable td{ border-bottom:1px dashed var(--muted); padding:10px; vertical-align:middle; }
+    #stylesTable td.namecell{ width:auto; }
+    #stylesTable td.segcell{ width:120px; padding-left:6px; text-align:left; }
+    #stylesTable td.namecell .desc{ color:#9fb3c8; }
+  </style>
+<style>
+/* === Add Button: full-width + prefix only (no color change) === */
+#addRoom, #addOtherFee, #addChargeRow, #addUser {
+  width: 100% !important;
+  font-weight: 600 !important;
+  font-size: 1.05rem !important;
+  padding: 10px 14px !important;
+}
+#addRoom::before, #addOtherFee::before, #addChargeRow::before, #addUser::before {
+  content: "+ ";
+  font-weight: 700;
+}
+</style>
+<style>
+/* CSS-only: dusty-rose Save Progress button */
+#saveLocal { background-color: #DCA1A1 !important; color: #fff !important; border-color: #DCA1A1 !important; }
+#saveLocal:hover { filter: brightness(0.96); }
+</style>
+<style>
+/* CSS-only: solid section borders (same gray) */
+.section { border-top: 1px solid #cfcfcf !important; }
+.section:first-child { border-top: 0 !important; }
+</style>
+<style>
+/* === v31l: remove pseudo-prefix so there's only one "+" in labels === */
+#addRoom::before,
+#addOtherFee::before,
+#addChargeRow::before,
+#addUser::before,
+.ts-add-btn::before,
+.ts-add-btn-lite::before {
+  content: "" !important;
+}
+</style>
+<style>
+/* === v31m: Safe visual tweaks (CSS-only) === */
+#saveLocal {
+  background-color: #FFEE8C !important; /* pastel yellow */
+  color: #000 !important;               /* dark text for contrast */
+  border-color: #FFEE8C !important;
+}
+#saveLocal:hover { filter: brightness(0.96); }
+
+.section {
+  border-top: 1px solid var(--muted) !important; /* match dark gray used on inputs */
+}
+.section:first-child { border-top: 0 !important; }
+</style>
+<style>
+/* === v31u-anchor-tip: circled 'i' as an anchor with native tooltip === */
+a.ua-help {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-left: 6px;
+  border-radius: 50%;
+  border: 1.5px solid var(--sub);
+  color: var(--sub);
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 16px;
+  cursor: help;
+  user-select: none;
+  text-decoration: none;
+}
+a.ua-help:focus { outline: 2px solid rgba(59,130,246,.35); outline-offset: 2px; }
+</style>
+</head>
+<body>
+  <div class="site-header">
+    <div class="site-header-inner">
+      <h1>Venue Information</h1>
+      <p class="lede">This form should only take a short time. We will use this form to gather <strong>vital</strong> information like your address, tax rate, users, etc. Once this form is filled out, we will have the basics required to build your site.</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <form id="venueForm" novalidate>
+        <!-- Business + Contact -->
+        <section class="section">
+          <header><h2>Business Name & Contact Info</h2></header>
+          <input type="text" id="ts_hp" name="ts_hp" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px;opacity:0;height:0;width:0" aria-hidden="true">
+          <div class="grid-2">
+            <div>
+              <label class="req" for="venueName">Full business name of your venue</label>
+              <input id="venueName" name="venueName" type="text" required placeholder="e.g., The Copper Hall" />
+            </div>
+            <div>
+              <label class="req" for="phone">Business phone number</label>
+              <input id="phone" name="phone" type="text" required placeholder="(555) 555-5555" />
+            </div>
+          </div>
+          <div class="grid-2" style="margin-top:12px">
+            <div>
+              <label class="req" for="website">Business Website</label>
+              <input id="website" name="website" type="text" required placeholder="www.example.com or https://example.com" />
+            </div>
+            <div>
+              <label for="logo">Upload your logo (optional)</label>
+              <div class="filebox">
+                <input id="logo" name="logo" type="file" accept="image/*" />
+                <button class="btn secondary" type="button" id="clearLogo">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:16px">
+            <label class="req" for="addr1"><strong>Business Address</strong></label>
+          </div>
+          <div class="grid-auto" style="margin-top:6px">
+            <div>
+              <label class="req" for="addr1">Street address</label>
+              <input id="addr1" name="addr1" type="text" required />
+            </div>
+            <div>
+              <label for="addr2">Street address line 2</label>
+              <input id="addr2" name="addr2" type="text" />
+            </div>
+            <div>
+              <label class="req" for="city">City</label>
+              <input id="city" name="city" type="text" required />
+            </div>
+            <div>
+              <label class="req" for="state">State</label>
+              <select id="state" name="state" required>
+                <option value="" disabled selected>Select state</option>
+                <option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>District of Columbia</option><option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option><option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option><option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option><option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option><option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option><option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option><option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option><option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option><option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option><option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option><option>Wisconsin</option><option>Wyoming</option>
+              </select>
+            </div>
+            <div>
+              <label class="req" for="zip">Zip code</label>
+              <input id="zip" name="zip" type="text" required placeholder="e.g., 12345 or 12345-6789" />
+            </div>
+          </div>
+        </section>
+
+        <!-- Rooms -->
+        <section class="section">
+          <header>
+            <h2>Room names & max capacities</h2>
+            <p class="hint">Add each bookable space.</p>
+            <p class="hint">Examples: “Ballroom — 220”, “Courtyard — 120”.</p>
+          </header>
+          <div style="overflow:auto">
+            <table class="table" id="roomsTable">
+              <thead>
+                <tr><th style="width:45%">Room name</th><th style="width:30%">Max capacity</th><th style="width:25%"></th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="footer-actions">
+            <button class="btn" type="button" id="addRoom">+ ADD BOOKABLE ROOM OR SPACE</button>
+          </div>
+        </section>
+
+        <!-- Percentage fees -->
+        <section class="section">
+          <header>
+            <h2>Percentage based fees</h2>
+            <p class="hint">Enter a percentage for each fee type. Use the slider to indicate if this fee itself is taxed (ie., do you tax gratuity 'yes' or 'no'). If you don't use one of the listed fees, use the remove button to remove it from this form. If you use the fee but call it something else, just highlight the text you need to change and type the correct fee name.</p>
+          </header>
+          <table class="table" id="feesTable">
+            <thead>
+              <tr><th>Fee</th><th style="width:160px">% Percentage</th><th style="width:140px">Taxed?</th><th>Note (optional)</th><th style="width:80px"></th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div class="footer-actions">
+            <button class="btn" type="button" id="addOtherFee">+ ADD PERCENTAGE BASED FEE</button>
+          </div>
+        </section>
+
+        <!-- Taxes & Fees Matrix -->
+        <section class="section">
+          <header>
+            <h2>What taxes & fees are applied?</h2>
+            <p class="hint">For each revenue category, check the dot in a column if that fee applies. Leave blank if it doesn't.</p>
+          </header>
+          <div style="overflow:auto">
+            <table class="table" id="chargesMatrix">
+              <thead>
+                <tr id="chargesHeader">
+                  <th style="width:22%">Revenue category</th>
+                </tr>
+              </thead>
+              <tbody id="chargesBody"></tbody>
+            </table>
+          </div>
+          <div class="footer-actions">
+            <button class="btn" type="button" id="addChargeRow">+ ADD REVENUE CATEGORY/GROUP</button>
+          </div>
+        </section>
+
+        <!-- Event styles -->
+        <section class="section">
+          <header><h2>Which event styles do you offer?</h2></header>
+          <div style="overflow:auto">
+            <table id="stylesTable">
+              <tbody id="stylesBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Users -->
+        <section class="section">
+          <header>
+            <h2>List of users</h2>
+            <p class="hint">Add you team members who you want to have access to Tripleseat.</p>
+          </header>
+          <div style="overflow:auto">
+            <table class="table" id="usersTable">
+              <thead>
+                <tr><th style="width:22%">Full name</th><th style="width:24%">Email</th><th style="width:18%">Job Title</th><th style="width:14%">Phone</th><th style="width:16%">User Access <a href="javascript:void(0)" class="ua-help" title="These can be adjusted at any time.
+• Admins — have full privileges.
+• Edit — for event planners who are daily users but may not need settings access.
+• View — for teammates who have limited view-only access." onclick="this.focus(); return false;" role="button" tabindex="0">i</a></th><th style="width:6%"></th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="footer-actions">
+            <button class="btn" type="button" id="addUser">+ ADD USER/TEAMMATE WHO WILL HAVE ACCESS TO TRIPLESEAT</button>
+          </div>
+        </section>
+
+        <!-- Description -->
+        <section class="section">
+          <header><h2>Venue description</h2></header>
+          <label class="req" for="description">Please add a short blurb we can use for your Eventup listing.</label>
+          <textarea id="description" name="description" required placeholder="e.g., Historic brick-walled venue with modern amenities and customizable menus..."></textarea>
+        </section>
+
+        <!-- Finish -->
+        <section class="section">
+          <header><h2>Finish & Submit</h2></header>
+          <div class="controls" style="margin-top:10px">
+            <button class="btn" type="button" id="submitWebhook">Submit to Tripleseat</button>
+            <button class="btn secondary" type="button" id="downloadDoc">Export Word (.doc)</button>
+          </div>
+          <p class="hint" id="submitHint"><strong>How to use:</strong> On <em>Submit to Tripleseat</em> we upload your answers as a Word file to our shared Google Drive folder (named after your venue) and also auto-download that Word file so you can attach it to your onboarding task. If network issues happen, we retry automatically.</p>
+          <div class="mono" id="statusBox">Status: idle.</div>
+        </section>
+
+        <!-- Save progress -->
+        <section class="section">
+          <header><h2>Need more time?</h2></header>
+          <p class="hint">Save your progress locally so you can come back later on the same device and browser. You can also reset the form to start fresh.</p>
+          <div class="controls" style="margin-top:10px">
+            <button class="btn secondary" type="button" id="saveLocal">Save Progress To Browser</button>
+            <button class="btn ghost" type="button" id="clearForm">Reset</button>
+          </div>
+        </section>
+
+        <!-- Self-tests -->
+        <section class="section" id="selfTestsSection">
+          <header><h2>Self-tests</h2></header>
+          <div class="controls" style="margin-bottom:10px">
+            <button class="btn secondary" type="button" id="runTests">Run tests</button>
+            <button class="btn ghost" type="button" id="loadDemo">Load demo</button>
+          </div>
+          <div id="testOutput" class="mono">Tests not yet run.</div>
+        </section>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxVznWgtG3Xk40f_C0YJvGO9tz3G3g-8YqrtXxYEsDoXSovNpejvfD9Fuf-Of8k3qDl/exec";
+    const SUBMIT_HEADERS = { 'Content-Type': 'text/plain;charset=utf-8' };
+
+    const starterFees = ['Sales tax','Gratuity','Admin fee','Service charge','Alcohol tax'];
+
+    const $ = (sel, ctx=document) => ctx.querySelector(sel);
+    const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
+    const create = (tag, props={}) => Object.assign(document.createElement(tag), props);
+
+    function segToggle(name, initial=null){
+      const wrap = create('div', { className:'seg', role:'group', 'aria-label':name });
+      const idY = name+'_y', idN = name+'_n';
+      const inY = create('input', { type:'radio', id:idY, name, value:'yes', checked: initial===true });
+      const laY = create('label', { htmlFor:idY, textContent:'Yes' });
+      const inN = create('input', { type:'radio', id:idN, name, value:'no', checked: initial===false });
+      const laN = create('label', { htmlFor:idN, textContent:'No' });
+      wrap.append(inY, laY, inN, laN);
+      return wrap;
+    }
+
+    function tbody(sel){
+      const tbl = document.querySelector(sel);
+      if (!tbl) return null;
+      return tbl.tBodies[0] || tbl.appendChild(document.createElement('tbody'));
+    }
+
+    function addRoom(row={ name:'', capacity:'' }){
+      const body = tbody('#roomsTable'); if (!body) return;
+      const tr = create('tr');
+      const tdName = create('td');
+      const tdCap = create('td');
+      const tdAct = create('td');
+      const iName = create('input', { type:'text', required:true, placeholder:'e.g., Ballroom', value:row.name });
+      const iCap  = create('input', { type:'number', required:true, min:'0', step:'1', placeholder:'0', value:row.capacity });
+      const del   = create('button', { className:'btn secondary', type:'button', textContent:'Remove' });
+      del.addEventListener('click', () => tr.remove());
+      tdName.append(iName); tdCap.append(iCap); tdAct.append(del); tr.append(tdName, tdCap, tdAct); body.append(tr);
+    }
+
+    function addFeeRow(label='Other tax/fee', row={ percent:'', note:'', taxed:null }){
+      const body = tbody('#feesTable'); if (!body) return;
+      const tr = create('tr');
+      const tdLabel = create('td');
+      const tdPct = create('td');
+      const tdTaxed = create('td');
+      const tdNote = create('td');
+      const tdAct = create('td');
+
+      const sLabel = create('input', { type:'text', value:label });
+      const iPct   = create('input', { type:'number', min:'0', step:'0.01', placeholder:'0.00', value:row.percent });
+      const iNote  = create('input', { type:'text', placeholder:'Optional note', value:row.note });
+
+      const isSalesTax = (label || '').trim().toLowerCase() === 'sales tax';
+      if (!isSalesTax) {
+        const name = 'taxed_' + Math.random().toString(36).slice(2,8);
+        const slider = segToggle(name, row.taxed===true ? true : row.taxed===false ? false : null);
+        tdTaxed.append(slider);
+      } else {
+        tdTaxed.textContent = '—';
+      }
+
+      const del    = create('button', { className:'btn secondary', type:'button', textContent:'Remove' });
+      del.addEventListener('click', () => { tr.remove(); rebuildChargesMatrix(); });
+      sLabel.addEventListener('input', rebuildChargesMatrix);
+
+      tdLabel.append(sLabel); tdPct.append(iPct); tdNote.append(iNote); tdAct.append(del);
+      tr.append(tdLabel, tdPct, tdTaxed, tdNote, tdAct);
+      body.append(tr);
+      rebuildChargesMatrix();
+    }
+
+    function addUser(row={ name:'', email:'', job:'', phone:'', access:'' }){
+      const body = tbody('#usersTable'); if (!body) return;
+      const tr = create('tr');
+      const tds = [create('td'), create('td'), create('td'), create('td'), create('td'), create('td')];
+
+      const iName  = create('input', { type:'text', required:true, placeholder:'Jane Smith', value:row.name });
+      const iEmail = create('input', { type:'email', required:true, placeholder:'jane@example.com', value:row.email });
+      const iJob   = create('input', { type:'text', placeholder:'Sales Manager', value:row.job });
+      const iPhone = create('input', { type:'text', placeholder:'(555) 555-5555', value:row.phone });
+
+      const selAccess = create('select', { required:true });
+      selAccess.append(create('option', { value:'', textContent:'' }));
+      ['Admin','Edit','View'].forEach(opt => selAccess.append(create('option', { value:opt, textContent:opt })));
+      if (row.access) selAccess.value = row.access;
+
+      const del    = create('button', { className:'btn secondary', type:'button', textContent:'Remove' });
+      del.addEventListener('click', () => tr.remove());
+
+      tds[0].append(iName);
+      tds[1].append(iEmail);
+      tds[2].append(iJob);
+      tds[3].append(iPhone);
+      tds[4].append(selAccess);
+      tds[5].append(del);
+      tr.append(...tds);
+      body.append(tr);
+    }
+
+    function currentFeesList(){
+      return $$('#feesTable tbody tr').map(tr => (tr.querySelector('td:nth-child(1) input')?.value || '').trim()).filter(x=>x);
+    }
+    function rebuildChargesMatrix(preserve=true){
+      const chargesHeader = document.getElementById('chargesHeader');
+      const chargesBody = document.getElementById('chargesBody');
+      if (!chargesHeader || !chargesBody) return;
+      const fees = currentFeesList();
+      chargesHeader.innerHTML = '<th style="width:22%">Revenue category</th>' + fees.map(f=>`<th>${f}</th>`).join('');
+      const prev = {};
+      if (preserve){
+        Array.from(chargesBody.querySelectorAll('tr')).forEach(tr => {
+          const b = tr.querySelector('td:nth-child(1) input')?.value || '';
+          if (!b) return; prev[b] = {};
+          fees.forEach((f, idx)=>{
+            const el = tr.querySelector(`td:nth-child(${idx+2}) input[type="checkbox"]`);
+            prev[b][f] = el && el.checked ? 'yes' : '';
+          });
+        });
+      }
+      const existing = Array.from(chargesBody.querySelectorAll('tr')).map(tr => tr.querySelector('td:nth-child(1) input')?.value || '').filter(x=>x);
+      const categories = existing.length ? existing : ['FOOD','BEVERAGE','ROOM RENTAL','AUDIO/VISUAL','LABOR','MISC ITEMS'];
+      chargesBody.innerHTML = '';
+      categories.forEach(cat => {
+        const tr = document.createElement('tr');
+        const tdName = document.createElement('td'); const iName = document.createElement('input'); iName.type='text'; iName.value=cat;
+        iName.addEventListener('input', ()=> rebuildChargesMatrix());
+        tdName.append(iName); tr.append(tdName);
+        fees.forEach(f => {
+          const td = document.createElement('td');
+          const wrap = document.createElement('div'); wrap.className='cell-center';
+          const dot = document.createElement('span'); dot.className='radio-dot';
+          const input = document.createElement('input'); input.type='checkbox'; input.setAttribute('aria-label', `${cat} – ${f}`);
+          if (prev[cat]?.[f]==='yes') input.checked = true;
+          dot.append(input); wrap.append(dot); td.append(wrap); tr.append(td);
+        });
+        chargesBody.append(tr);
+      });
+    }
+
+    function esc(str){ return String(str||'').replace(/[&<>]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt'}[s] || s)); }
+    function todayStr(){ const d=new Date(); const mm=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); return d.getFullYear()+"-"+mm+"-"+dd; }
+    function makeDocFilename(venue){ return `${(venue||'venue-information').replace(/[\\/:*?"<>|]+/g,'-').slice(0,180)}_${todayStr()}.doc`; }
+    function buildTable(headers, rows){
+      const ths = headers.map(h=>`<th style="text-align:left;border:1px solid #d6e2f0;padding:3px;background:#f5f9ff;font-size:11px;line-height:1.25">${esc(h)}</th>`).join('');
+      const trs = rows.map(r=>`<tr>${r.map(c=>`<td style="border:1px solid #d6e2f0;padding:3px;font-size:11px;line-height:1.25">${esc(c)}</td>`).join('')}</tr>`).join('');
+      return `<table style="border-collapse:collapse;width:100%;margin:4px 0"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
+    }
+    function buildWordHtml(data){
+      const rooms = buildTable(['Room','Max capacity'], data.rooms.map(r=>[r.name, String(r.capacity||'')]));
+      const feesTaxed = buildTable(['Fee','%','Taxed?','Note'], (data.fees||[]).map(f=>[f.label, (f.percent||f.percent===0)? String(f.percent) : '', (f.taxed===true?'Yes':f.taxed===false?'No':'—'), f.note||'']));
+      const feeCols = data.feesAllLabels || (data.fees||[]).map(f=>f.label);
+      const headers = ['Revenue category', ...feeCols];
+      const rows = (data.charges||[]).map(row => [row.bucket || row.category || row.cat || row.name || '', ...feeCols.map(f => (row.byFee?.[f] ? 'Y' : ''))]);
+      const matrix = buildTable(headers, rows);
+      const addrPieces = [data.address.street1, data.address.street2, `${data.address.city}, ${data.address.state} ${data.address.zip}`].filter(Boolean);
+      const addrInline = addrPieces.join(', ');
+      return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Venue Information</title>
+      <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:DoNotOptimizeForBrowser/></w:WordDocument></xml><![endif]-->
+      <style>
+        @page { size: landscape; margin:0.7in; }
+        @page Section1 { size: 11.0in 8.5in; mso-page-orientation:landscape; margin:0.7in; }
+        div.Section1 { page:Section1; }
+        body{font-family:Segoe UI,Arial,sans-serif;color:#0d1b2a;margin:6px}
+        h2{margin:8px 0 2px;border-bottom:1px solid #d6e2f0;padding-bottom:2px;color:#0d1b2a; font-size:13px}
+        table{border-collapse:collapse;width:100%;margin:4px 0}
+        th{ text-align:left;border:1px solid #d6e2f0; padding:3px; background:#f5f9ff; font-size:11px; line-height:1.25}
+        td{ border:1px solid #d6e2f0; padding:3px; font-size:11px; line-height:1.25 }
+        p{ margin:2px 0; font-size:11.5px }
+      </style>
+      <style>
+/* CSS-only: solid section borders (same gray) */
+.section { border-top: 1px solid #cfcfcf !important; }
+.section:first-child { border-top: 0 !important; }
+</style>
+</head><body>
+      <div class="Section1">
+      <h2>Business Name & Contact Info</h2>
+      <p><strong>Venue:</strong> ${esc(data.venueName)}<br/>
+      <strong>Phone:</strong> ${esc(data.phone)}<br/>
+      <strong>Website:</strong> ${esc(data.website)}<br/>
+      <strong>Address:</strong> ${esc(addrInline)}</p>
+      <h2>Rooms</h2>${rooms}
+      <h2>Percentage-based fees</h2>${feesTaxed}
+      <h2>What taxes & fees are applied?</h2>${matrix}
+      <h2>Users</h2>${buildTable(['Name','Email','Job Title','Phone','User Access'], data.users.map(u=>[u.name,u.email,u.job||'',u.phone||'',u.access||'']))}
+      <h2>Venue Description</h2>
+      <p>${esc(data.description)}</p>
+      </div>
+      </body></html>`;
+    }
+
+    function readLogoFile() {
+      const f = document.getElementById('logo')?.files?.[0];
+      return new Promise((resolve) => {
+        if (!f) return resolve(null);
+        const fr = new FileReader();
+        fr.onload = () => {
+          try {
+            const dataUrl = fr.result; // "data:mime;base64,AAAA..."
+            const m = /^data:([^;]+);base64,(.*)$/i.exec(dataUrl);
+            if (m) resolve({ filename: f.name || 'logo', mime: m[1], base64: m[2], dataUrl });
+            else resolve({ filename: f.name || 'logo', mime: f.type || 'application/octet-stream', base64: null, dataUrl });
+          } catch { resolve({ filename: f.name || 'logo', mime: f.type || 'application/octet-stream', base64: null, dataUrl: null }); }
+        };
+        fr.onerror = () => resolve({ filename: f.name || 'logo', mime: f.type || 'application/octet-stream', base64: null, dataUrl: null });
+        fr.readAsDataURL(f);
+      });
+    }
+
+    async function submitToWebhook(){
+      const form = document.getElementById('venueForm');
+      const btn = document.getElementById('submitWebhook');
+      const status = document.getElementById('statusBox');
+      if (!form.checkValidity()){
+        form.reportValidity();
+        const firstInvalid = form.querySelector(':invalid');
+        if (firstInvalid){ firstInvalid.scrollIntoView({ behavior:'smooth', block:'center' }); firstInvalid.focus({ preventScroll:true }); }
+        status.textContent = 'Please complete required fields before submitting.';
+        return;
+      }
+
+      if (btn) { btn.disabled = true; btn.textContent = 'Submitting…'; }
+      try{
+        const data = collectData({strict:true});
+        if (!data) { status.textContent = 'Could not collect form data.'; return; }
+
+        const logo = await readLogoFile(); // {filename,mime,base64,dataUrl} or null
+        const docHtml = buildWordHtml(data);
+        const payload = JSON.stringify({
+          ...data,
+          docHtml,
+          logo,
+          logoDataUrl: logo && logo.dataUrl ? logo.dataUrl : null, // extra compatibility
+          driveFolderId: '1maEdzBhOezo2U6mrn5cXfYq0Qn8hWd-3',
+          desiredFilename: makeDocFilename(data.venueName)
+        });
+
+        const res = await fetch(SUBMIT_URL, { method:'POST', headers: SUBMIT_HEADERS, body: payload, mode:'cors', credentials:'omit' });
+        const text = await res.text();
+        if (!res.ok) throw new Error(text || ('HTTP ' + res.status));
+        status.textContent = 'Thanks! ' + (text || 'Submission received.') + ' A Word copy will download now.';
+
+        try{
+          const blob = new Blob(['\ufeff', docHtml], { type:'application/msword' });
+          const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = makeDocFilename(data.venueName); a.click(); URL.revokeObjectURL(a.href);
+        }catch(e){ console.warn('Auto-download failed', e); }
+      }catch(e){
+        status.textContent = 'Submission failed: ' + (e?.message || e);
+      }finally{
+        if (btn) { btn.disabled = false; btn.textContent = 'Submit to Tripleseat'; }
+      }
+    }
+
+    function collectData(options){ const strict = !(options && options.strict===false);
+      const form = document.getElementById('venueForm');
+      if (strict){ if (!form || !form.checkValidity()){ form && form.reportValidity(); return null; } }
+      const feeLabelsAll = currentFeesList();
+      const data = {
+        venueName: document.getElementById('venueName')?.value.trim() || '',
+        phone: document.getElementById('phone')?.value.trim() || '',
+        website: document.getElementById('website')?.value.trim() || '',
+        address: {
+          street1: document.getElementById('addr1')?.value.trim() || '',
+          street2: document.getElementById('addr2')?.value.trim() || '',
+          city: document.getElementById('city')?.value.trim() || '',
+          state: document.getElementById('state')?.value || '',
+          zip: document.getElementById('zip')?.value.trim() || ''
+        },
+        rooms: Array.from(document.querySelectorAll('#roomsTable tbody tr')).map(tr => ({
+          name: tr.querySelector('td:nth-child(1) input')?.value.trim() || '',
+          capacity: Number(tr.querySelector('td:nth-child(2) input')?.value || 0)
+        })).filter(r => r.name),
+        feesAllLabels: feeLabelsAll.slice(),
+        fees: Array.from(document.querySelectorAll('#feesTable tbody tr')).map(tr => {
+          const label = tr.querySelector('td:nth-child(1) input')?.value.trim() || 'Other tax/fee';
+          const percent = Number(tr.querySelector('td:nth-child(2) input')?.value || 0);
+          const seg = tr.querySelector('td:nth-child(3) .seg');
+          let taxed = null;
+          if (seg){
+            const y = seg.querySelector('input[value="yes"]')?.checked;
+            const n = seg.querySelector('input[value="no"]')?.checked;
+            taxed = y ? true : n ? false : null;
+          }
+          const note = tr.querySelector('td:nth-child(4) input')?.value.trim() || undefined;
+          return { label, percent, note, taxed };
+        }),
+        eventStyles: Object.fromEntries(
+          [ ...document.querySelectorAll('#stylesBody .seg') ].map((seg) => {
+            const name = seg.getAttribute('aria-label') || '';
+            const key = name.replace(/^style_/, '');
+            const y = seg.querySelector('input[value="yes"]')?.checked;
+            const n = seg.querySelector('input[value="no"]')?.checked;
+            return [key, y ? true : n ? false : null];
+          })
+        ),
+        users: Array.from(document.querySelectorAll('#usersTable tbody tr')).map(tr => ({
+          name: tr.querySelector('td:nth-child(1) input')?.value.trim() || '',
+          email: tr.querySelector('td:nth-child(2) input')?.value.trim() || '',
+          job: tr.querySelector('td:nth-child(3) input')?.value.trim() || '',
+          phone: tr.querySelector('td:nth-child(4) input')?.value.trim() || '',
+          access: tr.querySelector('td:nth-child(5) select')?.value || ''
+        })).filter(u => u.name && u.email),
+        description: document.getElementById('description')?.value.trim() || '',
+        logoFilename: document.getElementById('logo')?.files?.[0]?.name || null,
+        meta: { generatedAt: new Date().toISOString(), origin: window.location.origin }
+      };
+      const fees = feeLabelsAll;
+      data.charges = Array.from(document.querySelectorAll('#chargesBody tr')).map(tr => {
+        const category = tr.querySelector('td:nth-child(1) input')?.value.trim() || '';
+        if (!category) return null;
+        const byFee = {};
+        fees.forEach((f, idx)=>{
+          const chk = tr.querySelector(`td:nth-child(${idx+2}) input[type="checkbox"]`);
+          byFee[f] = chk && chk.checked ? 'yes' : '';
+        });
+        return { bucket: category, byFee };
+      }).filter(Boolean);
+      return data;
+    }
+
+    function currentFeesList(){
+      return $$('#feesTable tbody tr').map(tr => (tr.querySelector('td:nth-child(1) input')?.value || '').trim()).filter(x=>x);
+    }
+
+    window.addEventListener('load', () => {
+      function seedAll(){
+        const rbody = tbody('#roomsTable'); if (rbody){ rbody.innerHTML=''; addRoom(); addRoom(); }
+        const fbody = tbody('#feesTable'); if (fbody){ fbody.innerHTML=''; starterFees.forEach(label => addFeeRow(label)); }
+        const ubody = tbody('#usersTable'); if (ubody){ ubody.innerHTML=''; addUser(); }
+
+        const styles = [
+          { key:'on_premise', label:'On premise' },
+          { key:'large_party_reservation', label:'Large Party Reservation', desc:'(mid-sized parties)' },
+          { key:'full_service_catering', label:'Full-service catering', desc:'(off-premise events)' },
+          { key:'drop_off_catering', label:'Drop-off catering', desc:'(delivery orders)' },
+          { key:'pickup_catering', label:'Pick-up catering', desc:'(guests come to you)' }
+        ];
+        const stylesBody = document.getElementById('stylesBody');
+        if (stylesBody){ stylesBody.innerHTML=''; styles.forEach(s => {
+          const tr = document.createElement('tr');
+          const tdName = document.createElement('td'); tdName.className='namecell';
+          tdName.innerHTML = s.label + (s.desc ? ' <span class="desc">'+s.desc+'</span>' : '');
+          const tdSeg = document.createElement('td'); tdSeg.className='segcell';
+          const slider = segToggle('style_'+s.key, null);
+          tdSeg.append(slider);
+          tr.append(tdName, tdSeg); stylesBody.append(tr);
+        }); }
+
+        rebuildChargesMatrix(false);
+
+        document.getElementById('addRoom')?.addEventListener('click', () => addRoom());
+        document.getElementById('addUser')?.addEventListener('click', () => addUser());
+        document.getElementById('addOtherFee')?.addEventListener('click', () => addFeeRow('TYPE NEW FEE HERE'));
+        document.getElementById('clearLogo')?.addEventListener('click', () => { const f=document.getElementById('logo'); if (f) f.value=''; });
+
+        document.getElementById('addChargeRow')?.addEventListener('click', ()=>{
+          const body = document.getElementById('chargesBody');
+          if (!body) return;
+          const tr = document.createElement('tr');
+          const tdName = document.createElement('td'); const iName = document.createElement('input'); iName.type='text'; iName.value='(insert an additional revenue category here)';
+          iName.addEventListener('input', ()=> rebuildChargesMatrix());
+          tdName.append(iName); tr.append(tdName);
+          body.append(tr);
+          rebuildChargesMatrix();
+        });
+
+        document.getElementById('downloadDoc')?.addEventListener('click', async () => {
+          const data = collectData({strict:true}); if(!data) return;
+          const html = buildWordHtml(data);
+          const blob = new Blob(['\ufeff', html], { type:'application/msword' });
+          const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = makeDocFilename(data.venueName); a.click(); URL.revokeObjectURL(a.href);
+        });
+
+        document.getElementById('submitWebhook')?.addEventListener('click', submitToWebhook);
+
+        document.getElementById('loadDemo')?.addEventListener('click', () => {
+          document.getElementById('venueForm').reset();
+          const rb = tbody('#roomsTable'); if (rb){ rb.innerHTML=''; addRoom({name:'Ballroom',capacity:220}); addRoom({name:'Courtyard',capacity:120}); }
+          const fb = tbody('#feesTable'); if (fb){
+            fb.innerHTML='';
+            ['Sales tax','Service charge','Gratuity','Admin fee','Alcohol tax'].forEach((l)=>{
+              if (l==='Service charge') addFeeRow(l,{percent:22, note:'House service', taxed:true});
+              else if (l==='Gratuity') addFeeRow(l,{percent:20, note:'', taxed:false});
+              else if (l==='Sales tax') addFeeRow(l,{percent:8.5, note:'City + State'});
+              else addFeeRow(l);
+            });
+            }
+          rebuildChargesMatrix(false);
+          const ub = tbody('#usersTable'); if (ub){ ub.innerHTML=''; addUser({name:'Jane Smith', email:'jane@copperhall.example', job:'Sales Manager', phone:'(212) 555-0100', access:'Admin'}); addUser({name:'Alex Lee', email:'alex@copperhall.example', job:'Event Coordinator', access:'Edit'}); }
+          document.getElementById('venueName').value='The Copper Hall'; document.getElementById('phone').value='(212) 555-0182'; document.getElementById('website').value='www.copperhall.example'; document.getElementById('addr1').value='123 Market St'; document.getElementById('addr2').value='Suite 4B'; document.getElementById('city').value='Savannah'; document.getElementById('state').value='Georgia'; document.getElementById('zip').value='31401';
+          document.getElementById('description').value='Historic brick-walled venue with natural light, modern A/V, and seasonal menus.';
+          document.getElementById('statusBox').textContent = 'Demo loaded.';
+        });
+
+        document.getElementById('saveLocal')?.addEventListener('click', () => { const data = collectData({strict:false}); if(!data) return; localStorage.setItem('venue_info_form', JSON.stringify(data)); alert('Saved to your browser.'); });
+        document.getElementById('clearForm')?.addEventListener('click', () => { if(!confirm('Clear all inputs?')) return; document.location.reload(); });
+
+        document.getElementById('runTests')?.addEventListener('click', () => {
+          const out = document.getElementById('testOutput');
+          const rowsRooms = document.querySelectorAll('#roomsTable tbody tr').length;
+          const rowsFees  = document.querySelectorAll('#feesTable tbody tr').length;
+          const rowsUsers = document.querySelectorAll('#usersTable tbody tr').length;
+          out.textContent = `Rooms rows: ${rowsRooms} • Fees rows: ${rowsFees} • Users rows: ${rowsUsers}`;
+        });
+      }
+      seedAll();
+    });
+  </script>
+
+<script>
+// === v31 safety/shim layer: appended without touching existing scripts ===
+(function(){
+  const ENDPOINT = "https://script.google.com/macros/s/AKfycbzEzdODCFcRGlQqTM43fHrTbcY6CTeB3WpzNWfCRG0uwxF_lDzfNUwQU2zhBGguJ7vO/exec";
+  // Ensure constants exist
+  try {
+    if (typeof window.SUBMIT_URL === 'undefined' || !window.SUBMIT_URL) window.SUBMIT_URL = ENDPOINT;
+    if (typeof window.SUBMIT_HEADERS === 'undefined' || !window.SUBMIT_HEADERS) window.SUBMIT_HEADERS = { "Content-Type": "application/json" };
+  } catch(e){}
+
+  document.addEventListener('DOMContentLoaded', function(){
+    // Tighten file accept at runtime (no DOM edits needed)
+    const logoEl = document.getElementById('logo');
+    if (logoEl) logoEl.setAttribute('accept', '.png,.jpg,.jpeg,.webp,.gif');
+  });
+
+  // ---- Strict readLogoFile() override ----
+  window.readLogoFile = function(){
+    const input = document.getElementById('logo');
+    const f = input && input.files ? input.files[0] : null;
+    const status = document.getElementById('statusBox');
+
+    const MAX_LOGO_BYTES = 5 * 1024 * 1024; // 5 MB
+    const SAFE_IMAGE_TYPES = new Set(['image/png','image/jpeg','image/webp','image/gif']);
+
+    function normalizeFilename(name, fallbackExt){
+      const safe = (name || 'logo').replace(/[\\/:*?"<>|]+/g, '-').slice(0,180);
+      if (!/\.(png|jpe?g|gif|webp)$/i.test(safe) && fallbackExt) return safe + fallbackExt;
+      return safe;
+    }
+    function extFromKind(kind){
+      return kind==='png'?'.png': kind==='jpeg'?'.jpg': kind==='gif'?'.gif': kind==='webp'?'.webp':'';
+    }
+    async function sniffImageKind(file){
+      const blob = file.slice(0, 12);
+      const buf  = await blob.arrayBuffer();
+      const b    = new Uint8Array(buf);
+      if (b.length >= 8 && b[0]===0x89 && b[1]===0x50 && b[2]===0x4E && b[3]===0x47 && b[4]===0x0D && b[5]===0x0A && b[6]===0x1A && b[7]===0x0A) return 'png';
+      if (b.length >= 3 && b[0]===0xFF && b[1]===0xD8 && b[2]===0xFF) return 'jpeg';
+      if (b.length >= 4 && b[0]===0x47 && b[1]===0x49 && b[2]===0x46 && b[3]===0x38) return 'gif';
+      if (b.length >= 12 && b[0]===0x52 && b[1]===0x49 && b[2]===0x46 && b[3]===0x46 && b[8]===0x57 && b[9]===0x45 && b[10]===0x42 && b[11]===0x50) return 'webp';
+      return null;
+    }
+
+    return new Promise(async (resolve) => {
+      try {
+        if (!f) { resolve(null); return; }
+
+        if (f.size > MAX_LOGO_BYTES){
+          if (status) status.textContent = '⚠️ Logo too large. Max 5 MB.';
+          resolve(null); return;
+        }
+        if (f.type && !SAFE_IMAGE_TYPES.has(f.type)){
+          if (status) status.textContent = '⚠️ Unsupported image type. Use PNG, JPG/JPEG, WEBP, or GIF.';
+          resolve(null); return;
+        }
+        const kind = await sniffImageKind(f);
+        if (!kind){
+          if (status) status.textContent = '⚠️ File does not look like a valid PNG/JPEG/WEBP/GIF.';
+          resolve(null); return;
+        }
+
+        const fr = new FileReader();
+        fr.onload = function(){
+          try {
+            const dataUrl = fr.result;
+            const m = /^data:([^;]+);base64,(.*)$/i.exec(String(dataUrl));
+            const mime = m ? m[1] : (f.type || 'application/octet-stream');
+            const base64 = m ? m[2] : null;
+            const filename = normalizeFilename(f.name, extFromKind(kind));
+            if (!base64){
+              if (status) status.textContent = '⚠️ Could not read image as base64.';
+              resolve(null);
+            } else {
+              resolve({ filename, mime, base64 });
+            }
+          } catch(_e){
+            resolve(null);
+          }
+        };
+        fr.onerror = function(){ resolve(null); };
+        fr.readAsDataURL(f);
+      } catch(_e){
+        resolve(null);
+      }
+    });
+  };
+
+  // ---- Wrap fetch to inject logo into JSON payload if missing ----
+  const _origFetch = window.fetch.bind(window);
+  window.fetch = async function(input, init){
+    try{
+      const url = (typeof input === 'string') ? input : (input && input.url);
+      if (url && url.indexOf('/macros/s/') !== -1 && init && typeof init.body === 'string' && init.body.trim().startsWith('{')){
+        let obj = null;
+        try { obj = JSON.parse(init.body); } catch(_e){ obj = null; }
+        if (obj){
+          // Ensure driveFolderId exists (safety)
+          if (!obj.driveFolderId) obj.driveFolderId = '1maEdzBhOezo2U6mrn5cXfYq0Qn8hWd-3';
+
+          if (!('logo' in obj)){
+            const status = document.getElementById('statusBox');
+            const logo = await window.readLogoFile();
+            if (logo){
+              if (status) status.textContent = 'Uploading form and logo…';
+              obj.logo = logo;
+            }else{
+              if (status) status.textContent = '⚠️ No logo uploaded or invalid file (PNG/JPG/WEBP/GIF up to 5 MB). Proceeding with form only...';
+            }
+            init.body = JSON.stringify(obj);
+          }
+        }
+      }
+    }catch(e){
+      console.log('fetch wrapper note:', e);
+    }
+    return _origFetch(input, init);
+  };
+
+  // ---- Wrap submitToWebhook to disable/enable controls ----
+  (function(){
+    const orig = window.submitToWebhook;
+    if (typeof orig === 'function'){
+      window.submitToWebhook = async function(){
+        const allCtrls = Array.from(document.querySelectorAll('button, input[type="submit"], input[type="button"]'));
+        allCtrls.forEach(el => el.disabled = true);
+        try{
+          await orig();
+        } finally {
+          allCtrls.forEach(el => el.disabled = false);
+        }
+      };
+    }
+  })();
+})();
+</script>
+
+</body>
+</html>
