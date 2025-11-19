@@ -877,5 +877,6 @@ a.ua-help:focus { outline: 2px solid rgba(59,130,246,.35); outline-offset: 2px; 
   })();
 })();
 </script>
+<script src="https://patrickagagni-stack.github.io/venue-information/tooltip.js" defer></script>
 </body>
 </html>
