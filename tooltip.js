@@ -1,8 +1,4 @@
-/* tooltip.js — Instant speech-bubble tooltips for .ua-help elements
-   - Works inside tables (bubble is appended to <body>, fixed-position)
-   - Triggers on hover, focus, and click (clicks on anchors are prevented)
-   - No dependencies; safe to include on any page
-*/
+/* tooltip.js — Instant HTML-capable speech-bubble tooltips for .ua-help elements */
 (function () {
   // Inject minimal CSS
   var css = [
@@ -32,12 +28,12 @@
   function hide() {
     bubble.style.display = "none";
     arrow.style.display = "none";
-    bubble.textContent = "";
+    bubble.innerHTML = "";
     currentAnchor = null;
   }
 
   function place(anchor, text) {
-    bubble.textContent = text || "";
+    bubble.innerHTML = text || "";
     bubble.style.display = "block";
     bubble.style.width = Math.min(420, Math.max(260, 320)) + "px";
     var r = anchor.getBoundingClientRect();
@@ -75,7 +71,6 @@
     if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
     var text = anchor.getAttribute("data-tip") || anchor.getAttribute("title") || "";
     if (!text) return;
-    // Move native title into data-tip to avoid delayed browser tooltip
     anchor.setAttribute("data-tip", text);
     anchor.removeAttribute("title");
     currentAnchor = anchor;
@@ -84,14 +79,11 @@
 
   function scheduleHide() {
     if (hideTimer) clearTimeout(hideTimer);
-    hideTimer = setTimeout(hide, 120); // tiny linger feels nicer
+    hideTimer = setTimeout(hide, 120);
   }
 
   function attach(el) {
-    // If it’s an <a>, prevent scroll-to-top
-    if (el.tagName === "A") {
-      el.addEventListener("click", function (e) { e.preventDefault(); });
-    }
+    if (el.tagName === "A") el.addEventListener("click", function (e) { e.preventDefault(); });
     el.addEventListener("mouseenter", function () { show(el); }, { passive: true });
     el.addEventListener("mouseleave", scheduleHide, { passive: true });
     el.addEventListener("focus", function () { show(el); });
@@ -106,9 +98,6 @@
     window.addEventListener("resize", function () { if (currentAnchor) hide(); });
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
 })();
